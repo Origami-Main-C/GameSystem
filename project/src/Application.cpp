@@ -48,7 +48,11 @@ int main() {
     fileDialog.SetTitle("file browser");
     std::filesystem::path pwd("../");
     fileDialog.SetPwd(pwd);
+    bool openFileDialog=false;
+    int time=0;
     while (!gamesystem.ShouldClose()) {
+        if(time=1)
+            openFileDialog= false;
         float currentFrame = static_cast<float>(glfwGetTime());
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
@@ -69,14 +73,7 @@ int main() {
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
         static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
-#ifdef NO_RESIZE
-        dockspace_flags ^= ImGuiDockNodeFlags_NoResize;
-#endif
-#ifdef MENU_BAR
         ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
-#else
-        ImGuiWindowFlags window_flags =ImGuiWindowFlags_NoDocking;
-#endif
         const ImGuiViewport* viewport = ImGui::GetMainViewport();
         ImGui::SetNextWindowPos(viewport->WorkPos);
         ImGui::SetNextWindowSize(viewport->WorkSize);
@@ -92,12 +89,30 @@ int main() {
         ImGuiIO& io = ImGui::GetIO();
         ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
         ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
-#ifdef MENU_BAR
         if (ImGui::BeginMenuBar())
         {
-            if (ImGui::BeginMenu("Options"))
+            if (ImGui::BeginMenu("Add"))
             {
-                if (ImGui::MenuItem("Close", NULL, false, true))
+                if (ImGui::MenuItem("Model", NULL, false, true))
+                {
+                    openFileDialog= true;
+                    time=1;
+
+                }
+                if (ImGui::MenuItem("Light", NULL, false, true))
+                {
+
+                }
+                ImGui::EndMenu();
+            }
+            if (ImGui::BeginMenu("Shader"))
+            {
+                if (ImGui::MenuItem("New", NULL, false, true))
+                {
+                    openFileDialog= true;
+                    time=1;
+                }
+                if (ImGui::MenuItem("Set Default", NULL, false, true))
                 {
 
                 }
@@ -105,22 +120,15 @@ int main() {
             }
             ImGui::EndMenuBar();
         }
-#endif
         ImGui::End();
-        ImGui::Begin("Color Edit", nullptr);
-        ImGui::ColorEdit3("background color", (float *) &color);
+        ImGui::Begin("Viewport", nullptr);
         ImGui::End();
-        ImGui::Begin("Color Edit2");
-        ImGui::ColorEdit3("rectangle color", (float *) &rectangle_color);
-        ImGui::SliderAngle("Rotate Angle", &angle_change, 0.0f);
+        ImGui::Begin("Object Editor");
         ImGui::End();
-        if(ImGui::Begin("File Browser"))
+        if(openFileDialog)
         {
-            // open file dialog when user clicks this button
-            if(ImGui::Button("open file dialog"))
-                fileDialog.Open();
+            fileDialog.Open();
         }
-        ImGui::End();
         fileDialog.Display();
         if(fileDialog.HasSelected())
         {
